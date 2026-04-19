@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 
 import qs.components
 import qs.services
-import qs.config
+import Caelestia.Config
 import Quickshell
 import QtQuick
 import QtQuick.Controls
@@ -16,12 +16,12 @@ ColumnLayout {
     readonly property int currMonth: currentDate.getMonth()
     readonly property int currYear: currentDate.getFullYear()
 
-    spacing: Appearance.spacing.normal
+    spacing: Tokens.spacing.normal
 
     StyledText {
         text: Time.format("HH:mm:ss")
-        font.family: Appearance.font.family.mono
-        font.pointSize: Appearance.font.size.large
+        font.family: Tokens.font.family.mono
+        font.pointSize: Tokens.font.size.large
         font.weight: 500
         color: Colours.palette.m3primary
     }
@@ -34,14 +34,14 @@ ColumnLayout {
 
     RowLayout {
         Layout.fillWidth: true
-        spacing: Appearance.spacing.small
+        spacing: Tokens.spacing.small
 
         Item {
             implicitWidth: implicitHeight
-            implicitHeight: prevIcon.implicitHeight + Appearance.padding.small * 2
+            implicitHeight: prevIcon.implicitHeight + Tokens.padding.small * 2
 
             StateLayer {
-                radius: Appearance.rounding.full
+                radius: Tokens.rounding.full
 
                 function onClicked(): void {
                     root.currentDate = new Date(root.currYear, root.currMonth - 1, 1);
@@ -54,17 +54,17 @@ ColumnLayout {
                 anchors.centerIn: parent
                 text: "chevron_left"
                 color: Colours.palette.m3onSurfaceVariant
-                font.pointSize: Appearance.font.size.normal
+                font.pointSize: Tokens.font.size.normal
                 font.weight: 700
             }
         }
 
         Item {
             Layout.fillWidth: true
-            implicitHeight: monthLabel.implicitHeight + Appearance.padding.small * 2
+            implicitHeight: monthLabel.implicitHeight + Tokens.padding.small * 2
 
             StateLayer {
-                radius: Appearance.rounding.full
+                radius: Tokens.rounding.full
                 disabled: {
                     const now = new Date();
                     return root.currMonth === now.getMonth() && root.currYear === now.getFullYear();
@@ -81,7 +81,7 @@ ColumnLayout {
                 anchors.centerIn: parent
                 text: grid.title
                 color: Colours.palette.m3primary
-                font.pointSize: Appearance.font.size.normal
+                font.pointSize: Tokens.font.size.normal
                 font.weight: 500
                 font.capitalization: Font.Capitalize
             }
@@ -89,10 +89,10 @@ ColumnLayout {
 
         Item {
             implicitWidth: implicitHeight
-            implicitHeight: nextIcon.implicitHeight + Appearance.padding.small * 2
+            implicitHeight: nextIcon.implicitHeight + Tokens.padding.small * 2
 
             StateLayer {
-                radius: Appearance.rounding.full
+                radius: Tokens.rounding.full
 
                 function onClicked(): void {
                     root.currentDate = new Date(root.currYear, root.currMonth + 1, 1);
@@ -105,7 +105,7 @@ ColumnLayout {
                 anchors.centerIn: parent
                 text: "chevron_right"
                 color: Colours.palette.m3onSurfaceVariant
-                font.pointSize: Appearance.font.size.normal
+                font.pointSize: Tokens.font.size.normal
                 font.weight: 700
             }
         }
@@ -141,14 +141,14 @@ ColumnLayout {
             required property var model
 
             implicitWidth: implicitHeight
-            implicitHeight: dayText.implicitHeight + Appearance.padding.small * 2
+            implicitHeight: dayText.implicitHeight + Tokens.padding.small * 2
 
             StyledRect {
                 anchors.centerIn: parent
                 visible: dayItem.model.today
                 implicitWidth: parent.implicitWidth
                 implicitHeight: parent.implicitHeight
-                radius: Appearance.rounding.full
+                radius: Tokens.rounding.full
                 color: Colours.palette.m3primary
             }
 
@@ -167,7 +167,7 @@ ColumnLayout {
                     return Colours.palette.m3onSurfaceVariant;
                 }
                 opacity: dayItem.model.today || dayItem.model.month === grid.month ? 1 : 0.4
-                font.pointSize: Appearance.font.size.normal
+                font.pointSize: Tokens.font.size.normal
                 font.weight: dayItem.model.today ? 700 : 500
             }
         }

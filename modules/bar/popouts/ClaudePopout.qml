@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import qs.components
-import qs.config
+import Caelestia.Config
 import qs.services
 import Quickshell
 import Quickshell.Io
@@ -51,7 +51,7 @@ ColumnLayout {
         onFileChanged: reload()
     }
 
-    spacing: Appearance.spacing.normal
+    spacing: Tokens.spacing.normal
     width: 220
 
     StyledText {
@@ -61,16 +61,16 @@ ColumnLayout {
 
     ColumnLayout {
         Layout.fillWidth: true
-        spacing: Appearance.spacing.smaller
+        spacing: Tokens.spacing.smaller
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Appearance.spacing.small
+            spacing: Tokens.spacing.small
 
             StyledText {
                 text: qsTr("5-hour")
                 color: Colours.palette.m3onSurfaceVariant
-                font.pointSize: Appearance.font.size.small
+                font.pointSize: Tokens.font.size.small
             }
 
             Item { Layout.fillWidth: true }
@@ -83,8 +83,8 @@ ColumnLayout {
                     if (root.fiveHourUtil < 80) return Colours.palette.m3tertiary;
                     return Colours.palette.m3error;
                 }
-                font.pointSize: Appearance.font.size.small
-                font.family: Appearance.font.family.mono
+                font.pointSize: Tokens.font.size.small
+                font.family: Tokens.font.family.mono
                 font.weight: 500
             }
         }
@@ -115,23 +115,23 @@ ColumnLayout {
             visible: root.fiveHourReset !== ""
             text: "resets in " + root.formatReset(root.fiveHourReset)
             color: Colours.palette.m3onSurfaceVariant
-            font.pointSize: Appearance.font.size.small
-            font.family: Appearance.font.family.mono
+            font.pointSize: Tokens.font.size.small
+            font.family: Tokens.font.family.mono
         }
     }
 
     ColumnLayout {
         Layout.fillWidth: true
-        spacing: Appearance.spacing.smaller
+        spacing: Tokens.spacing.smaller
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Appearance.spacing.small
+            spacing: Tokens.spacing.small
 
             StyledText {
                 text: qsTr("7-day")
                 color: Colours.palette.m3onSurfaceVariant
-                font.pointSize: Appearance.font.size.small
+                font.pointSize: Tokens.font.size.small
             }
 
             Item { Layout.fillWidth: true }
@@ -144,8 +144,8 @@ ColumnLayout {
                     if (root.sevenDayUtil < 80) return Colours.palette.m3tertiary;
                     return Colours.palette.m3error;
                 }
-                font.pointSize: Appearance.font.size.small
-                font.family: Appearance.font.family.mono
+                font.pointSize: Tokens.font.size.small
+                font.family: Tokens.font.family.mono
                 font.weight: 500
             }
         }
@@ -176,21 +176,21 @@ ColumnLayout {
             visible: root.sevenDayReset !== ""
             text: "resets in " + root.formatReset(root.sevenDayReset)
             color: Colours.palette.m3onSurfaceVariant
-            font.pointSize: Appearance.font.size.small
-            font.family: Appearance.font.family.mono
+            font.pointSize: Tokens.font.size.small
+            font.family: Tokens.font.family.mono
         }
     }
 
     RowLayout {
         visible: root.subscription.length > 0
         Layout.fillWidth: true
-        spacing: Appearance.spacing.small
+        spacing: Tokens.spacing.small
 
         StyledText {
             text: root.subscription
             color: Colours.palette.m3onSurfaceVariant
-            font.pointSize: Appearance.font.size.small
-            font.family: Appearance.font.family.mono
+            font.pointSize: Tokens.font.size.small
+            font.family: Tokens.font.family.mono
         }
 
         Item { Layout.fillWidth: true }
@@ -199,8 +199,8 @@ ColumnLayout {
             visible: root.rateTier.length > 0
             text: root.rateTier
             color: Colours.palette.m3onSurfaceVariant
-            font.pointSize: Appearance.font.size.small
-            font.family: Appearance.font.family.mono
+            font.pointSize: Tokens.font.size.small
+            font.family: Tokens.font.family.mono
         }
     }
 

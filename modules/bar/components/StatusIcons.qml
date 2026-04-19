@@ -4,7 +4,7 @@ import qs.components
 import qs.components.controls
 import qs.services
 import qs.utils
-import qs.config
+import Caelestia.Config
 import Quickshell
 import Quickshell.Bluetooth
 import Quickshell.Io
@@ -19,11 +19,11 @@ StyledRect {
     readonly property alias items: iconColumn
 
     color: Colours.tPalette.m3surfaceContainer
-    radius: Appearance.rounding.full
+    radius: Tokens.rounding.full
 
     clip: true
-    implicitWidth: Config.bar.sizes.innerWidth
-    implicitHeight: iconColumn.implicitHeight + Appearance.padding.normal * 2 - (Config.bar.status.showLockStatus && !Hypr.capsLock && !Hypr.numLock ? iconColumn.spacing : 0)
+    implicitWidth: Tokens.sizes.bar.innerWidth
+    implicitHeight: iconColumn.implicitHeight + Tokens.padding.normal * 2 - (Config.bar.status.showLockStatus && !Hypr.capsLock && !Hypr.numLock ? iconColumn.spacing : 0)
 
     ColumnLayout {
         id: iconColumn
@@ -31,9 +31,9 @@ StyledRect {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: Appearance.padding.normal
+        anchors.bottomMargin: Tokens.padding.normal
 
-        spacing: Appearance.spacing.smaller / 2
+        spacing: Tokens.spacing.smaller / 2
 
         // Lock keys status
         WrappedLoader {
@@ -138,7 +138,7 @@ StyledRect {
                 animate: true
                 text: Hypr.kbLayout
                 color: root.colour
-                font.family: Appearance.font.family.mono
+                font.family: Tokens.font.family.mono
             }
         }
 
@@ -174,7 +174,7 @@ StyledRect {
             active: Config.bar.status.showBluetooth
 
             sourceComponent: ColumnLayout {
-                spacing: Appearance.spacing.smaller / 2
+                spacing: Tokens.spacing.smaller / 2
 
                 // Bluetooth icon
                 MaterialIcon {
@@ -213,14 +213,14 @@ StyledRect {
                             Anim {
                                 from: 1
                                 to: 0
-                                duration: Appearance.anim.durations.large
-                                easing.bezierCurve: Appearance.anim.curves.standardAccel
+                                duration: Tokens.anim.durations.large
+                                easing: Tokens.anim.standardAccel
                             }
                             Anim {
                                 from: 0
                                 to: 1
-                                duration: Appearance.anim.durations.large
-                                easing.bezierCurve: Appearance.anim.curves.standardDecel
+                                duration: Tokens.anim.durations.large
+                                easing: Tokens.anim.standardDecel
                             }
                         }
                     }
@@ -385,14 +385,14 @@ StyledRect {
                         Anim {
                             from: 1
                             to: 0.3
-                            duration: Appearance.anim.durations.large
-                            easing.bezierCurve: Appearance.anim.curves.standardAccel
+                            duration: Tokens.anim.durations.large
+                            easing: Tokens.anim.standardAccel
                         }
                         Anim {
                             from: 0.3
                             to: 1
-                            duration: Appearance.anim.durations.large
-                            easing.bezierCurve: Appearance.anim.curves.standardDecel
+                            duration: Tokens.anim.durations.large
+                            easing: Tokens.anim.standardDecel
                         }
                     }
                 }

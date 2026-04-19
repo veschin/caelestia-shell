@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 
 import qs.components
 import qs.components.controls
-import qs.config
+import Caelestia.Config
 import Quickshell
 import Quickshell.Io
 import QtQuick
@@ -105,7 +105,7 @@ Item {
     Column {
         id: col
 
-        spacing: Appearance.spacing.small
+        spacing: Tokens.spacing.small
 
         MaterialIcon {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -120,14 +120,14 @@ Item {
                 Anim {
                     from: 1
                     to: 0.3
-                    duration: Appearance.anim.durations.large
-                    easing.bezierCurve: Appearance.anim.curves.standardAccel
+                    duration: Tokens.anim.durations.large
+                    easing: Tokens.anim.standardAccel
                 }
                 Anim {
                     from: 0.3
                     to: 1
-                    duration: Appearance.anim.durations.large
-                    easing.bezierCurve: Appearance.anim.curves.standardDecel
+                    duration: Tokens.anim.durations.large
+                    easing: Tokens.anim.standardDecel
                 }
             }
         }
@@ -136,8 +136,8 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             visible: root.fiveHourUtil >= 0
             text: Math.round(root.fiveHourUtil) + "%"
-            font.pointSize: Appearance.font.size.small
-            font.family: Appearance.font.family.mono
+            font.pointSize: Tokens.font.size.small
+            font.family: Tokens.font.family.mono
             color: root.colour
             horizontalAlignment: Text.AlignHCenter
         }
@@ -146,8 +146,8 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             visible: root.resetStr !== ""
             text: root.resetStr
-            font.pointSize: Appearance.font.size.smallest
-            font.family: Appearance.font.family.mono
+            font.pointSize: Tokens.font.size.smallest
+            font.family: Tokens.font.family.mono
             color: root.colour
             horizontalAlignment: Text.AlignHCenter
         }

@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import qs.components
-import qs.config
+import Caelestia.Config
 import qs.services
 import Quickshell
 import Quickshell.Io
@@ -17,7 +17,7 @@ ColumnLayout {
     property string country: ""
     property string city: ""
 
-    spacing: Appearance.spacing.normal
+    spacing: Tokens.spacing.normal
     width: 220
 
     StyledText {
@@ -27,12 +27,12 @@ ColumnLayout {
 
     RowLayout {
         Layout.fillWidth: true
-        spacing: Appearance.spacing.small
+        spacing: Tokens.spacing.small
 
         MaterialIcon {
             text: "shield"
             color: root.amneziaActive ? Colours.palette.m3primary : Colours.palette.m3onSurfaceVariant
-            font.pointSize: Appearance.font.size.normal
+            font.pointSize: Tokens.font.size.normal
         }
 
         StyledText {
@@ -44,19 +44,19 @@ ColumnLayout {
         StyledText {
             text: root.amneziaActive ? qsTr("On") : qsTr("Off")
             color: root.amneziaActive ? Colours.palette.m3primary : Colours.palette.m3onSurfaceVariant
-            font.pointSize: Appearance.font.size.small
-            font.family: Appearance.font.family.mono
+            font.pointSize: Tokens.font.size.small
+            font.family: Tokens.font.family.mono
         }
     }
 
     RowLayout {
         Layout.fillWidth: true
-        spacing: Appearance.spacing.small
+        spacing: Tokens.spacing.small
 
         MaterialIcon {
             text: "work"
             color: root.openconnectActive ? Colours.palette.m3tertiary : Colours.palette.m3onSurfaceVariant
-            font.pointSize: Appearance.font.size.normal
+            font.pointSize: Tokens.font.size.normal
         }
 
         StyledText {
@@ -68,20 +68,20 @@ ColumnLayout {
         StyledText {
             text: root.openconnectActive ? qsTr("On") : qsTr("Off")
             color: root.openconnectActive ? Colours.palette.m3tertiary : Colours.palette.m3onSurfaceVariant
-            font.pointSize: Appearance.font.size.small
-            font.family: Appearance.font.family.mono
+            font.pointSize: Tokens.font.size.small
+            font.family: Tokens.font.family.mono
         }
     }
 
     RowLayout {
         visible: root.externalIp.length > 0
         Layout.fillWidth: true
-        spacing: Appearance.spacing.small
+        spacing: Tokens.spacing.small
 
         MaterialIcon {
             text: "language"
             color: Colours.palette.m3onSurfaceVariant
-            font.pointSize: Appearance.font.size.normal
+            font.pointSize: Tokens.font.size.normal
         }
 
         ColumnLayout {
@@ -91,15 +91,15 @@ ColumnLayout {
             StyledText {
                 text: root.externalIp
                 color: Colours.palette.m3onSurfaceVariant
-                font.pointSize: Appearance.font.size.small
-                font.family: Appearance.font.family.mono
+                font.pointSize: Tokens.font.size.small
+                font.family: Tokens.font.family.mono
             }
 
             StyledText {
                 visible: root.country.length > 0
                 text: root.city.length > 0 ? root.city + ", " + root.country : root.country
                 color: Colours.palette.m3onSurfaceVariant
-                font.pointSize: Appearance.font.size.small
+                font.pointSize: Tokens.font.size.small
             }
         }
     }

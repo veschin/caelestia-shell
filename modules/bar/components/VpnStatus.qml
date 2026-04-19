@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import qs.components
-import qs.config
+import Caelestia.Config
 import Quickshell
 import Quickshell.Io
 import QtQuick
@@ -14,7 +14,7 @@ Column {
     property bool openconnectActive: false
     property color colour: anyActive ? Colours.palette.m3primary : Colours.palette.m3surfaceContainerHighest
 
-    spacing: Appearance.spacing.small
+    spacing: Tokens.spacing.small
 
     MaterialIcon {
         anchors.horizontalCenter: parent.horizontalCenter
@@ -27,7 +27,7 @@ Column {
         visible: root.amneziaActive
         text: "shield"
         color: Colours.palette.m3primary
-        font.pointSize: Appearance.font.size.smaller
+        font.pointSize: Tokens.font.size.smaller
     }
 
     MaterialIcon {
@@ -35,7 +35,7 @@ Column {
         visible: root.openconnectActive
         text: "work"
         color: Colours.palette.m3tertiary
-        font.pointSize: Appearance.font.size.smaller
+        font.pointSize: Tokens.font.size.smaller
     }
 
     Timer {
