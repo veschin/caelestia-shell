@@ -1,14 +1,16 @@
 pragma ComponentBehavior: Bound
 
-import QtQuick
-import QtQuick.Layouts
-import Quickshell
-import Quickshell.Bluetooth
-import Quickshell.Services.UPower
-import Caelestia.Config
 import qs.components
+import qs.components.controls
 import qs.services
 import qs.utils
+import qs.config
+import Quickshell
+import Quickshell.Bluetooth
+import Quickshell.Io
+import Quickshell.Services.UPower
+import QtQuick
+import QtQuick.Layouts
 
 StyledRect {
     id: root
@@ -17,11 +19,11 @@ StyledRect {
     readonly property alias items: iconColumn
 
     color: Colours.tPalette.m3surfaceContainer
-    radius: Tokens.rounding.full
+    radius: Appearance.rounding.full
 
     clip: true
-    implicitWidth: Tokens.sizes.bar.innerWidth
-    implicitHeight: iconColumn.implicitHeight + Tokens.padding.normal * 2 - (Config.bar.status.showLockStatus && !Hypr.capsLock && !Hypr.numLock ? iconColumn.spacing : 0)
+    implicitWidth: Config.bar.sizes.innerWidth
+    implicitHeight: iconColumn.implicitHeight + Appearance.padding.normal * 2 - (Config.bar.status.showLockStatus && !Hypr.capsLock && !Hypr.numLock ? iconColumn.spacing : 0)
 
     ColumnLayout {
         id: iconColumn
@@ -29,9 +31,9 @@ StyledRect {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: Tokens.padding.normal
+        anchors.bottomMargin: Appearance.padding.normal
 
-        spacing: Tokens.spacing.smaller / 2
+        spacing: Appearance.spacing.smaller / 2
 
         // Lock keys status
         WrappedLoader {
@@ -136,7 +138,7 @@ StyledRect {
                 animate: true
                 text: Hypr.kbLayout
                 color: root.colour
-                font.family: Tokens.font.family.mono
+                font.family: Appearance.font.family.mono
             }
         }
 
@@ -172,15 +174,15 @@ StyledRect {
             active: Config.bar.status.showBluetooth
 
             sourceComponent: ColumnLayout {
-                spacing: Tokens.spacing.smaller / 2
+                spacing: Appearance.spacing.smaller / 2
 
                 // Bluetooth icon
                 MaterialIcon {
                     animate: true
                     text: {
-                        if (!Bluetooth.defaultAdapter?.enabled) // qmllint disable unresolved-type
+                        if (!Bluetooth.defaultAdapter?.enabled)
                             return "bluetooth_disabled";
-                        if (Bluetooth.devices.values.some(d => d.connected)) // qmllint disable unresolved-type
+                        if (Bluetooth.devices.values.some(d => d.connected))
                             return "bluetooth_connected";
                         return "bluetooth";
                     }
@@ -190,7 +192,7 @@ StyledRect {
                 // Connected bluetooth devices
                 Repeater {
                     model: ScriptModel {
-                        values: Bluetooth.devices.values.filter(d => d.state !== BluetoothDeviceState.Disconnected) // qmllint disable unresolved-type
+                        values: Bluetooth.devices.values.filter(d => d.state !== BluetoothDeviceState.Disconnected)
                     }
 
                     MaterialIcon {
@@ -204,21 +206,21 @@ StyledRect {
                         fill: 1
 
                         SequentialAnimation on opacity {
-                            running: device.modelData?.state !== BluetoothDeviceState.Connected // qmllint disable unresolved-type
+                            running: device.modelData?.state !== BluetoothDeviceState.Connected
                             alwaysRunToEnd: true
                             loops: Animation.Infinite
 
                             Anim {
                                 from: 1
                                 to: 0
-                                duration: Tokens.anim.durations.large
-                                easing: Tokens.anim.standardAccel
+                                duration: Appearance.anim.durations.large
+                                easing.bezierCurve: Appearance.anim.curves.standardAccel
                             }
                             Anim {
                                 from: 0
                                 to: 1
-                                duration: Tokens.anim.durations.large
-                                easing: Tokens.anim.standardDecel
+                                duration: Appearance.anim.durations.large
+                                easing.bezierCurve: Appearance.anim.curves.standardDecel
                             }
                         }
                     }
@@ -259,12 +261,200 @@ StyledRect {
                 fill: 1
             }
         }
+
+        // VPN status
+        WrappedLoader {
+            name: "vpn"
+            active: Config.bar.status.showVpn !== false
+
+            sourceComponent: Item {
+                id: vpnItem
+
+                property bool vpnActive: false
+
+                implicitWidth: vpnIcon.implicitWidth
+                implicitHeight: vpnIcon.implicitHeight
+
+                MaterialIcon {
+                    id: vpnIcon
+
+                    anchors.centerIn: parent
+                    animate: true
+                    text: vpnItem.vpnActive ? "vpn_key" : "vpn_key_off"
+                    color: vpnItem.vpnActive ? Colours.palette.m3primary : root.colour
+                }
+
+                Timer {
+                    running: true
+                    repeat: true
+                    interval: 5000
+                    triggeredOnStart: true
+                    onTriggered: vpnProc.running = true
+                }
+
+                Process {
+                    id: vpnProc
+
+                    command: ["bash", Quickshell.env("HOME") + "/.local/bin/vpn-status.sh"]
+                    stdout: StdioCollector {
+                        onStreamFinished: {
+                            try {
+                                const data = JSON.parse(text);
+                                vpnItem.vpnActive = data.anyActive;
+                            } catch (e) {
+                                vpnItem.vpnActive = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Claude API limits
+        WrappedLoader {
+            name: "claude"
+            active: Config.bar.status.showClaude !== false
+
+            sourceComponent: Item {
+                id: claudeItem
+
+                property real fiveHourUtil: -1
+                property string resetsAt: ""
+                property real lastFetchTime: 0
+                property bool isLoading: false
+                property int tick: 0
+
+                readonly property color colour: {
+                    if (fiveHourUtil >= 80) return Colours.palette.m3error;
+                    if (fiveHourUtil >= 50) return Colours.palette.m3tertiary;
+                    return root.colour;
+                }
+
+                property string resetStr: {
+                    void(tick);
+                    return formatReset(resetsAt);
+                }
+
+                property string tooltipStr: {
+                    if (fiveHourUtil < 0)
+                        return isLoading ? "загрузка..." : "нет данных";
+                    if (fiveHourUtil === 0)
+                        return "лимиты свободны";
+                    return Math.round(fiveHourUtil) + "%" + (resetStr ? " | сброс через " + resetStr : "");
+                }
+
+                function shouldFetch(): bool {
+                    return Date.now() - lastFetchTime > 120000;
+                }
+
+                function formatReset(iso: string): string {
+                    if (!iso) return "";
+                    const diff = new Date(iso) - new Date();
+                    if (diff <= 0) return "скоро";
+                    const h = Math.floor(diff / 3600000);
+                    const m = Math.floor((diff % 3600000) / 60000);
+                    if (h > 0) return h + "ч " + m + "м";
+                    return m + "м";
+                }
+
+                function parseData(raw: string): void {
+                    try {
+                        const data = JSON.parse(raw);
+                        if (!data.error && data.five_hour) {
+                            fiveHourUtil = data.five_hour.utilization;
+                            resetsAt = data.five_hour.resets_at ?? "";
+                        }
+                    } catch (e) {}
+                }
+
+                implicitWidth: claudeIcon.implicitWidth
+                implicitHeight: claudeIcon.implicitHeight
+
+                MaterialIcon {
+                    id: claudeIcon
+
+                    anchors.centerIn: parent
+                    text: "smart_toy"
+                    color: claudeItem.colour
+
+                    SequentialAnimation on opacity {
+                        running: claudeItem.isLoading
+                        loops: Animation.Infinite
+                        alwaysRunToEnd: true
+
+                        Anim {
+                            from: 1
+                            to: 0.3
+                            duration: Appearance.anim.durations.large
+                            easing.bezierCurve: Appearance.anim.curves.standardAccel
+                        }
+                        Anim {
+                            from: 0.3
+                            to: 1
+                            duration: Appearance.anim.durations.large
+                            easing.bezierCurve: Appearance.anim.curves.standardDecel
+                        }
+                    }
+                }
+
+                MouseArea {
+                    id: mouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    acceptedButtons: Qt.NoButton
+                    onContainsMouseChanged: {
+                        if (containsMouse && claudeItem.shouldFetch()) {
+                            claudeItem.isLoading = true;
+                            claudeProc.running = true;
+                        }
+                    }
+                }
+
+                Tooltip {
+                    target: claudeItem
+                    text: claudeItem.tooltipStr
+                }
+
+                FileView {
+                    path: Quickshell.env("HOME") + "/.cache/claude-limits.json"
+                    onLoaded: claudeItem.parseData(text())
+                    watchChanges: true
+                    onFileChanged: reload()
+                }
+
+                Timer {
+                    running: true
+                    repeat: true
+                    interval: 120000
+                    triggeredOnStart: true
+                    onTriggered: claudeProc.running = true
+                }
+
+                Timer {
+                    running: claudeItem.resetsAt !== ""
+                    repeat: true
+                    interval: 60000
+                    onTriggered: claudeItem.tick++
+                }
+
+                Process {
+                    id: claudeProc
+                    command: ["bash", Quickshell.env("HOME") + "/.local/bin/claude-limits.sh"]
+                    stdout: StdioCollector {
+                        onStreamFinished: {
+                            claudeItem.isLoading = false;
+                            claudeItem.lastFetchTime = Date.now();
+                            claudeItem.parseData(text);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     component WrappedLoader: Loader {
         required property string name
 
-        asynchronous: true
         Layout.alignment: Qt.AlignHCenter
         visible: active
     }
