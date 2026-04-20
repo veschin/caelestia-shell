@@ -28,7 +28,7 @@ Item {
         anchors.horizontalCenterOffset: -1
 
         text: "power_settings_new"
-        color: Colours.palette.m3error
+        color: Colours.palette.m3primary
         font.bold: true
         font.pointSize: Tokens.font.size.normal
     }

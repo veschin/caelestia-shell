@@ -8,7 +8,7 @@ import qs.services
 StyledRect {
     id: root
 
-    readonly property color colour: Colours.palette.m3tertiary
+    readonly property color colour: Colours.palette.m3primary
     readonly property int padding: Config.bar.clock.background ? Tokens.padding.normal : Tokens.padding.small
 
     implicitWidth: Tokens.sizes.bar.innerWidth

@@ -47,7 +47,7 @@ StyledRect {
     implicitWidth: Tokens.sizes.bar.innerWidth - Tokens.padding.small * 2
     implicitHeight: size
     radius: Tokens.rounding.full
-    color: Colours.palette.m3primary
+    color: Qt.alpha(Colours.palette.m3primary, 0.55)
 
     Colouriser {
         source: root.mask
