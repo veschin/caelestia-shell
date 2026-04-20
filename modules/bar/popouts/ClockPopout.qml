@@ -42,10 +42,7 @@ ColumnLayout {
 
             StateLayer {
                 radius: Tokens.rounding.full
-
-                function onClicked(): void {
-                    root.currentDate = new Date(root.currYear, root.currMonth - 1, 1);
-                }
+                onClicked: root.currentDate = new Date(root.currYear, root.currMonth - 1, 1)
             }
 
             MaterialIcon {
@@ -69,10 +66,7 @@ ColumnLayout {
                     const now = new Date();
                     return root.currMonth === now.getMonth() && root.currYear === now.getFullYear();
                 }
-
-                function onClicked(): void {
-                    root.currentDate = new Date();
-                }
+                onClicked: root.currentDate = new Date()
             }
 
             StyledText {
@@ -93,10 +87,7 @@ ColumnLayout {
 
             StateLayer {
                 radius: Tokens.rounding.full
-
-                function onClicked(): void {
-                    root.currentDate = new Date(root.currYear, root.currMonth + 1, 1);
-                }
+                onClicked: root.currentDate = new Date(root.currYear, root.currMonth + 1, 1)
             }
 
             MaterialIcon {
