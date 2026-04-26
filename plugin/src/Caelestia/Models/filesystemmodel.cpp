@@ -64,6 +64,10 @@ QString FileSystemEntry::mimeType() const {
     return m_mimeType;
 }
 
+QDateTime FileSystemEntry::lastModified() const {
+    return m_fileInfo.lastModified();
+}
+
 void FileSystemEntry::updateRelativePath(const QDir& dir) {
     const auto relPath = dir.relativeFilePath(m_path);
     if (m_relativePath != relPath) {

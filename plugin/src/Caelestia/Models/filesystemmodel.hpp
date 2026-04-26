@@ -1,6 +1,7 @@
 #pragma once
 
 #include <qabstractitemmodel.h>
+#include <qdatetime.h>
 #include <qdir.h>
 #include <qfilesystemwatcher.h>
 #include <qfuture.h>
@@ -27,6 +28,7 @@ class FileSystemEntry : public QObject {
     Q_PROPERTY(bool isDir READ isDir CONSTANT)
     Q_PROPERTY(bool isImage READ isImage CONSTANT)
     Q_PROPERTY(QString mimeType READ mimeType CONSTANT)
+    Q_PROPERTY(QDateTime lastModified READ lastModified CONSTANT)
 
 public:
     explicit FileSystemEntry(const QString& path, const QString& relativePath, QObject* parent = nullptr);
@@ -41,6 +43,7 @@ public:
     [[nodiscard]] bool isDir() const;
     [[nodiscard]] bool isImage() const;
     [[nodiscard]] QString mimeType() const;
+    [[nodiscard]] QDateTime lastModified() const;
 
     void updateRelativePath(const QDir& dir);
 
