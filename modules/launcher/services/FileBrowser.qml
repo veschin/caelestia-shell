@@ -3,7 +3,7 @@ pragma Singleton
 import "../../../utils/scripts/fzf.js" as Fzf
 import QtQuick
 import Quickshell
-import Caelestia
+import Caelestia.Config
 import Caelestia.Models
 import qs.services
 import qs.utils
@@ -183,7 +183,7 @@ Singleton {
     }
 
     function openTerminal(dir: string): void {
-        Quickshell.execDetached(["sh", "-c", 'cd "$1" && shift && exec "$@"', "_", dir, "app2unit", "--", ...Config.general.apps.terminal]);
+        Quickshell.execDetached(["app2unit", "--", "env", "-C", dir, ...GlobalConfig.general.apps.terminal]);
     }
 
     function imageList(): list<var> {
