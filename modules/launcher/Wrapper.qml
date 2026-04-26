@@ -37,7 +37,7 @@ Item {
     implicitWidth: content.implicitWidth || 630 // Hard coded fallback for first open
     opacity: 1 - offsetScale
 
-    Component.onCompleted: Qt.callLater(() => Apps) // Load apps on init
+    Component.onCompleted: Qt.callLater(() => { Apps; FileBrowser; })
 
     Behavior on offsetScale {
         Anim {

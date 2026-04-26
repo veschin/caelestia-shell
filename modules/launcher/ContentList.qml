@@ -6,6 +6,7 @@ import qs.components
 import qs.components.controls
 import qs.services
 import qs.utils
+import qs.modules.launcher.services
 
 Item {
     id: root
@@ -19,13 +20,16 @@ Item {
     required property int rounding
 
     readonly property bool showWallpapers: search.text.startsWith(`${GlobalConfig.launcher.actionPrefix}wallpaper `)
-    readonly property var currentList: showWallpapers ? wallpaperList.item : appList.item // Can be either ListView or PathView, so can't type properly
+    readonly property bool showFileBrowser: !showWallpapers && FileBrowser.isActive
+    readonly property var currentList: showWallpapers ? wallpaperList.item
+        : showFileBrowser ? fileBrowserView.item?.currentList
+        : appList.item
 
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.bottom: parent.bottom
 
     clip: true
-    state: showWallpapers ? "wallpapers" : "apps"
+    state: showWallpapers ? "wallpapers" : showFileBrowser ? "filebrowser" : "apps"
 
     states: [
         State {
@@ -49,6 +53,20 @@ Item {
                 root.implicitWidth: Math.max(root.Tokens.sizes.launcher.itemWidth * 1.2, wallpaperList.implicitWidth)
                 root.implicitHeight: root.Tokens.sizes.launcher.wallpaperHeight
                 wallpaperList.active: true
+            }
+        },
+        State {
+            name: "filebrowser"
+
+            PropertyChanges {
+                root.implicitWidth: root.Tokens.sizes.launcher.itemWidth
+                root.implicitHeight: Math.min(root.maxHeight, fileBrowserView.implicitHeight > 0 ? fileBrowserView.implicitHeight : empty.implicitHeight)
+                fileBrowserView.active: true
+            }
+
+            AnchorChanges {
+                anchors.left: root.parent.left
+                anchors.right: root.parent.right
             }
         }
     ]
@@ -104,11 +122,24 @@ Item {
         }
     }
 
+    Loader {
+        id: fileBrowserView
+
+        active: false
+
+        anchors.fill: parent
+
+        sourceComponent: FileBrowserView {
+            search: root.search
+            visibilities: root.visibilities
+        }
+    }
+
     Row {
         id: empty
 
-        opacity: root.currentList?.count === 0 ? 1 : 0
-        scale: root.currentList?.count === 0 ? 1 : 0.5
+        opacity: root.state !== "filebrowser" && root.currentList?.count === 0 ? 1 : 0
+        scale: root.state !== "filebrowser" && root.currentList?.count === 0 ? 1 : 0.5
 
         spacing: Tokens.spacing.normal
         padding: Tokens.padding.large
@@ -117,7 +148,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
 
         MaterialIcon {
-            text: root.state === "wallpapers" ? "wallpaper_slideshow" : "manage_search"
+            text: root.state === "wallpapers" ? "wallpaper_slideshow" : root.state === "filebrowser" ? "folder_open" : "manage_search"
             color: Colours.palette.m3onSurfaceVariant
             font.pointSize: Tokens.font.size.extraLarge
 

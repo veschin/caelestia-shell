@@ -41,6 +41,32 @@ Item {
             padding: root.padding
             rounding: root.rounding
         }
+
+        Connections {
+            target: FileBrowser
+
+            function onFileActivated(entry): void {
+                if (entry.isDir) {
+                    FileBrowser.navigateInto(entry.name);
+                    search.text = FileBrowser.rawInput;
+                } else if (entry.isImage && FileBrowser.viewMode === "grid") {
+                    const images = FileBrowser.imageList();
+                    const idx = images.findIndex(e => e.path === entry.path);
+                    quickLook.open(images, Math.max(0, idx));
+                } else {
+                    FileBrowser.openFile(entry.path);
+                    root.visibilities.launcher = false;
+                }
+            }
+        }
+    }
+
+    QuickLook {
+        id: quickLook
+
+        anchors.fill: parent
+        searchField: search
+        visibilities: root.visibilities
     }
 
     StyledRect {
@@ -80,7 +106,31 @@ Item {
 
             placeholderText: qsTr("Type \"%1\" for commands").arg(GlobalConfig.launcher.actionPrefix)
 
+            onTextChanged: FileBrowser.parseInput(text)
+
             onAccepted: {
+                if (FileBrowser.isActive) {
+                    const currentItem = list.currentList?.currentItem;
+                    if (!currentItem)
+                        return;
+                    const entry = currentItem.modelData;
+
+                    if (entry.isDir) {
+                        FileBrowser.navigateInto(entry.name);
+                        text = FileBrowser.rawInput;
+                        return;
+                    }
+                    if (entry.isImage && FileBrowser.viewMode === "grid") {
+                        const images = FileBrowser.imageList();
+                        const idx = images.findIndex(e => e.path === entry.path);
+                        quickLook.open(images, Math.max(0, idx));
+                        return;
+                    }
+                    FileBrowser.openFile(entry.path);
+                    root.visibilities.launcher = false;
+                    return;
+                }
+
                 const currentItem = list.currentList?.currentItem;
                 if (currentItem) {
                     if (list.showWallpapers) {
@@ -103,9 +153,65 @@ Item {
             Keys.onUpPressed: list.currentList?.decrementCurrentIndex()
             Keys.onDownPressed: list.currentList?.incrementCurrentIndex()
 
-            Keys.onEscapePressed: root.visibilities.launcher = false
+            Keys.onEscapePressed: {
+                if (quickLook.active)
+                    quickLook.close();
+                else
+                    root.visibilities.launcher = false;
+            }
 
             Keys.onPressed: event => {
+                if (FileBrowser.isActive) {
+                    if (event.key === Qt.Key_Tab) {
+                        const completed = FileBrowser.tabComplete();
+                        if (completed)
+                            search.text = completed;
+                        event.accepted = true;
+                        return;
+                    }
+
+                    if (event.key === Qt.Key_Backspace && (event.modifiers & Qt.AltModifier)) {
+                        FileBrowser.navigateUp();
+                        search.text = FileBrowser.rawInput;
+                        event.accepted = true;
+                        return;
+                    }
+
+                    if (event.modifiers & Qt.ControlModifier) {
+                        if (event.key === Qt.Key_G) {
+                            FileBrowser.viewMode = FileBrowser.viewMode === "grid" ? "list" : "grid";
+                            event.accepted = true;
+                            return;
+                        }
+                        if (event.key === Qt.Key_I) {
+                            FileBrowser.filterMode = FileBrowser.filterMode === "images" ? "all" : "images";
+                            event.accepted = true;
+                            return;
+                        }
+                        if (event.key === Qt.Key_C) {
+                            const item = list.currentList?.currentItem;
+                            if (!item)
+                                return;
+                            const entry = item.modelData;
+                            if (event.modifiers & Qt.ShiftModifier) {
+                                const mime = (entry.mimeType ?? "application/octet-stream").replace(/'/g, "'\\''");
+                                const path = entry.path.replace(/'/g, "'\\''");
+                                Quickshell.execDetached(["sh", "-c", "wl-copy --type '" + mime + "' < '" + path + "'"]);
+                            } else {
+                                Quickshell.execDetached(["wl-copy", entry.path]);
+                            }
+                            event.accepted = true;
+                            return;
+                        }
+                        if (event.key === Qt.Key_T) {
+                            FileBrowser.openTerminal(FileBrowser.currentDir);
+                            root.visibilities.launcher = false;
+                            event.accepted = true;
+                            return;
+                        }
+                    }
+                }
+
                 if (!GlobalConfig.launcher.vimKeybinds)
                     return;
 
@@ -130,8 +236,10 @@ Item {
 
             Connections {
                 function onLauncherChanged(): void {
-                    if (!root.visibilities.launcher)
+                    if (!root.visibilities.launcher) {
                         search.text = "";
+                        FileBrowser.reset();
+                    }
                 }
 
                 function onSessionChanged(): void {
