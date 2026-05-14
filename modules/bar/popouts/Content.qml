@@ -141,6 +141,11 @@ Item {
             sourceComponent: ClaudePopout {}
         }
 
+        Popout {
+            name: "web3"
+            sourceComponent: Web3Popout {}
+        }
+
         Repeater {
             model: ScriptModel {
                 values: SystemTray.items.values.filter(i => !GlobalConfig.bar.tray.hiddenIcons.includes(i.id))

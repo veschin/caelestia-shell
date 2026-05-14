@@ -450,6 +450,14 @@ StyledRect {
                 }
             }
         }
+
+        WrappedLoader {
+            name: "web3"
+            active: true
+            sourceComponent: Web3Progress {
+                colour: root.colour
+            }
+        }
     }
 
     component WrappedLoader: Loader {
